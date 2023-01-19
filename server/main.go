@@ -6,12 +6,37 @@ import (
  "log"
 )
 
+type Itin struct {
+	ID			int		`json:"id"`
+	CarPrice 	int		`json:"car"`
+	CarType		string	`json:"carType"`
+	PlanePrice	int		`json:"planePrice"`
+	PlaneType	string	`json:"planeType"`
+	HotelPrice	int		`json:"HotelPrice"`
+	HotelType	string	`json:"HotelType"`
+}
+
 func main (){
-	fmt.Print("hello world asshole")
+
 	app := fiber.New()
 
-	app.Get("/healthchecl", func(c *fiber.Ctx) error{
+	itins := []Itin{}
+
+	app.Get("/healthcheck", func(c *fiber.Ctx) error{
 		return c.SendString("ok")
+	})
+
+	app.Post("/api/itin", func(c *fiber.Ctx) error {
+		itin := &Itin{}
+
+		if err := c.BodyParser(itin); err != nil {
+			return err
+		}
+
+		itin.ID = len(itins) + 1
+		itins = append(itins, *itin)
+
+		return c.JSON(itins)
 	})
 
 	log.Fatal(app.Listen(":4000"))
